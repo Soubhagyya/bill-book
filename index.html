@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="Offline Billing App & Bharat UPI QR Generator for local shops and merchants. Works in flight mode with WhatsApp receipt sharing.">
+  <title>Bill Book | Offline Retail Billing & UPI QR Generator</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="shop-badge">
+        <div class="shop-icon">🏪</div>
+        <div>
+          <h1 id="shop-name-header" class="shop-title">Sharma Stores</h1>
+          <span class="shop-sub">Offline POS & UPI QR Generator</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button id="tab-new-bill" class="nav-tab active">New Bill</button>
+        <button id="tab-history" class="nav-tab">Today's Sales</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-body">
+    <div class="app-layout">
+
+      <!-- VIEW 1: BILL GENERATOR -->
+      <section id="view-new-bill" class="bill-view-section">
+        
+        <!-- Left: Item Selection & Current Bill -->
+        <div class="bill-creator-pane">
+          
+          <div class="pane-header">
+            <div class="pane-title-group">
+              <h2>Invoice Items</h2>
+              <span id="bill-number-badge" class="badge-pill">#104</span>
+            </div>
+            <button id="btn-reset-bill" class="btn btn-outline-secondary btn-sm">Clear / Reset</button>
+          </div>
+
+          <!-- Quick Catalog Pills -->
+          <div class="catalog-section">
+            <span class="section-label">Quick Add from Catalog:</span>
+            <div id="catalog-pills" class="catalog-pills-wrap">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Custom Item Entry Form -->
+          <div class="custom-entry-box">
+            <input type="text" id="custom-item-name" placeholder="Custom Item Name (e.g. Atta 5kg)" class="form-input flex-2">
+            <input type="number" id="custom-item-price" placeholder="Price (₹)" class="form-input flex-1" min="1">
+            <input type="number" id="custom-item-qty" placeholder="Qty" class="form-input flex-1" value="1" min="1">
+            <input type="text" id="custom-item-unit" placeholder="Unit" class="form-input flex-1" value="kg">
+            <button id="btn-add-custom-item" class="btn btn-secondary">+ Add</button>
+          </div>
+
+          <!-- Bill Items Table -->
+          <div class="table-container">
+            <table class="bill-table">
+              <thead>
+                <tr>
+                  <th>Item Description</th>
+                  <th>Qty / Unit</th>
+                  <th>Rate</th>
+                  <th>Amount</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="bill-items-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Discount & Tax Adjusters -->
+          <div class="adjusters-row">
+            <div class="adjuster-item">
+              <label for="discount-val">Discount:</label>
+              <div class="input-with-select">
+                <input type="number" id="discount-val" value="0" min="0" class="form-input-sm">
+                <select id="discount-type" class="form-select-sm">
+                  <option value="flat">₹ Flat</option>
+                  <option value="percent">% Percent</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="adjuster-item">
+              <label for="tax-rate-select">GST / Tax Rate:</label>
+              <select id="tax-rate-select" class="form-select-sm">
+                <option value="0">0% (Nil)</option>
+                <option value="5">5% GST</option>
+                <option value="12">12% GST</option>
+                <option value="18">18% GST</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Payment & Summary Pane (Matches Preview on Page 9) -->
+        <aside class="bill-summary-pane">
+          
+          <div class="receipt-card-mockup">
+            <div class="receipt-head">
+              <h3>Sharma Stores</h3>
+              <p>Instant UPI Checkout</p>
+            </div>
+
+            <div class="rollup-list">
+              <div class="rollup-row">
+                <span>Subtotal:</span>
+                <span id="subtotal-val">₹0</span>
+              </div>
+              <div class="rollup-row">
+                <span>Tax (GST):</span>
+                <span id="tax-amount-val">+ ₹0</span>
+              </div>
+              <div class="rollup-row grand-total-row">
+                <span>Total:</span>
+                <strong id="grand-total-val" class="highlight-total">₹285</strong>
+              </div>
+            </div>
+
+            <!-- Offline UPI QR Code -->
+            <div class="qr-container">
+              <canvas id="upi-qr-canvas"></canvas>
+              <span id="qr-amount-label" class="qr-label">Scan to Pay ₹285</span>
+              <small class="upi-hint">Supports Google Pay, PhonePe, Paytm, BHIM</small>
+            </div>
+
+            <!-- Actions -->
+            <div class="summary-actions">
+              <button id="btn-share-whatsapp" class="btn btn-whatsapp btn-block">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                Share on WhatsApp
+              </button>
+
+              <button id="btn-download-receipt" class="btn btn-outline-secondary btn-block">
+                Download Receipt Card (PNG)
+              </button>
+
+              <button id="btn-finalize-bill" class="btn btn-primary btn-block">
+                Finalize & Record Bill
+              </button>
+            </div>
+
+          </div>
+
+        </aside>
+
+      </section>
+
+      <!-- VIEW 2: TODAY'S SALES & BILL HISTORY -->
+      <section id="view-history" class="history-view-section hidden">
+        
+        <div class="today-sales-hero">
+          <span class="hero-label">Today</span>
+          <span class="hero-sub">Total sales</span>
+          <h2 id="today-total-sales" class="hero-amount">₹4,860</h2>
+        </div>
+
+        <div class="history-card-box">
+          <div class="history-card-header">
+            <h3>Recent Bills Issued Today</h3>
+            <button onclick="document.getElementById('tab-new-bill').click()" class="btn btn-primary btn-sm">+ New bill</button>
+          </div>
+
+          <div id="today-bills-list" class="today-bills-grid">
+            <!-- Populated dynamically with #104 ₹285, #103 ₹640... -->
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- RECEIPT MODAL PREVIEW -->
+  <div id="receipt-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Official Invoice Receipt</h3>
+      </div>
+      <div class="modal-body modal-receipt-body">
+        <canvas id="receipt-preview-canvas"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-close-receipt" class="btn btn-secondary">Close</button>
+        <button id="btn-modal-download-png" class="btn btn-primary">Download Receipt Image</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast-notice hidden"></div>
+
+  <!-- Scripts: 100% Offline, Zero external CDN dependencies -->
+  <script src="./js/qr-code.js"></script>
+  <script src="./js/catalog.js"></script>
+  <script src="./js/billing.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
